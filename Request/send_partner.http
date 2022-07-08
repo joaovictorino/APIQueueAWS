@@ -1,0 +1,4 @@
+POST http://localhost/
+Content-Type: application/json
+
+{ "partner" : "partner1" }

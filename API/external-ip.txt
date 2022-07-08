@@ -1,0 +1,13 @@
+curl icanhazip.com
+
+curl -4 icanhazip.com
+
+curl ifconfig.me
+
+curl api.ipify.org
+
+curl ipinfo.io/ip
+
+curl ipecho.net/plain
+
+curl http://mockbin.org/request

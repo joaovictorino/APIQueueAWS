@@ -1,0 +1,39 @@
+version: '3'
+
+networks:
+  sample:
+
+services:
+    api:
+      build: API
+      ports:
+        - 80:80
+      networks:
+        - sample
+      environment:
+        - LOCAL=1
+        - QUEUE=amqp://rabbitmq:5672
+
+    program:
+      build: Program
+      networks:
+        - sample
+      restart: always
+      environment:
+        - LOCAL=1
+        - QUEUE=amqp://rabbitmq:5672
+
+    program_partner1:
+      build: Program
+      networks:
+        - sample
+      restart: always
+      environment:
+        - LOCAL=1
+        - QUEUE=amqp://rabbitmq:5672
+        - PARTNER1=1
+
+    rabbitmq:
+      image: rabbitmq:latest
+      networks:
+        - sample
