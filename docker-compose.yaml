@@ -10,6 +10,7 @@ services:
         - 80:80
       networks:
         - sample
+      restart: always
       environment:
         - LOCAL=1
         - QUEUE=amqp://rabbitmq:5672
@@ -34,6 +35,8 @@ services:
         - PARTNER1=1
 
     rabbitmq:
-      image: rabbitmq:latest
+      image: rabbitmq:3-management
+      ports:
+        - 15672:15672
       networks:
         - sample

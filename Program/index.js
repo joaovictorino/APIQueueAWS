@@ -1,5 +1,9 @@
 const amqp = require('amqplib/callback_api')
 const request = require('request')
+
+const dotenv = require('dotenv');
+dotenv.config();
+
 const opt = { credentials: require('amqplib').credentials.plain('joao', 'Teste@admin123')  }
 
 if (process.env.LOCAL){
@@ -10,6 +14,7 @@ if (process.env.LOCAL){
     
 function connect (err, conn) {
     process.once('SIGINT', function() { conn.close(); });
+
     conn.createChannel((err, ch) => {
         var queue = 'rpc_queue';
 
@@ -32,7 +37,6 @@ function connect (err, conn) {
 
                 if(data){
                     console.log(`Sending response ${data}`);
-
                     ch.sendToQueue(msg.properties.replyTo, 
                         Buffer.from(`{ body: ${body.partner}, request: ${data}}`),
                         {correlationId: msg.properties.correlationId});

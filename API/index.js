@@ -1,9 +1,17 @@
-const express = require('express')
-const bodyParser = require('body-parser')
 const amqp = require('amqplib/callback_api')
 const uuid = require('uuid')
+
+const dotenv = require('dotenv');
+dotenv.config();
+
+const express = require('express')
+const bodyParser = require('body-parser')
 const app = express()
 app.use(bodyParser.json())
+
+const { EventEmitter } = require('events');
+const eventEmitter = new EventEmitter();
+
 const port = 80
 const opt = { credentials: require('amqplib').credentials.plain('joao', 'Teste@admin123')  }
 
@@ -20,12 +28,15 @@ function connect (err, conn) {
         channel = ch;
         ch.assertQueue('', {exclusive:true}, (err, q) =>{
             queue_receive = q;
+            ch.consume(q.queue, (msg) => {
+                eventEmitter.emit(msg.properties.correlationId, msg.content)
+            }, {noAck: false});
         });
     });
 }
 
 app.post('/', (req, res) => {
-    const correlation = uuid.v1();
+    var correlation = uuid.v1();
 
     console.log(`Sending message "${req.body.partner}" to queue`)
 
@@ -35,16 +46,14 @@ app.post('/', (req, res) => {
         queue = 'rpc_queue_partner1';
     } 
 
+    eventEmitter.once(correlation, msg => {
+        console.log(`Received from queue ${msg}`);
+        res.send(msg.toString());
+    });
+
     channel.sendToQueue(queue, 
                 Buffer.from(`{ "partner" : "${req.body.partner}" }`),
                 {correlationId:correlation, replyTo: queue_receive.queue});
-
-    channel.consume(queue_receive.queue, (msg) => {
-        console.log(`Received from queue ${msg.content}`);
-        if(msg.properties.correlationId == correlation){
-            res.send(msg.content.toString());
-        }
-    }, {noAck: true});
 })
 
 app.get('/', (req, res) =>{
