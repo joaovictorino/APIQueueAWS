@@ -2,7 +2,7 @@
 
 This is a sample code demonstrating how to use Express framework and RabbitMQ implementing [RPC Pattern](https://www.enterpriseintegrationpatterns.com/patterns/messaging/RequestReply.html).
 
-Hosting the application on AWS, without code changes, just replacing RabbitMQ for Amazon MQ, and ECS Fargate for application.
+Hosting the application on AWS, without code changes, just replacing RabbitMQ for Amazon MQ, and ECS Fargate for application containers.
 
 ![alt architecture](.documentation/architecture.jpg "Architecture")
 
